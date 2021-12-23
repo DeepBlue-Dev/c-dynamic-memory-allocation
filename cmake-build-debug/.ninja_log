@@ -1,0 +1,9 @@
+# ninja log v5
+0	372	6619831580562765	CMakeFiles/c_dyn_alloc.dir/main.c.obj	ffc950f68c7856de
+2	91	6619832100603376	CMakeFiles/c_dyn_alloc.dir/main.c.obj	ffc950f68c7856de
+2	114	6619834312158465	CMakeFiles/c_dyn_alloc.dir/main.c.obj	ffc950f68c7856de
+115	269	6619834313667841	c_dyn_alloc.exe	830c0bea34fb373e
+2	99	6619834719054262	CMakeFiles/c_dyn_alloc.dir/main.c.obj	ffc950f68c7856de
+99	253	6619834720573895	c_dyn_alloc.exe	830c0bea34fb373e
+2	108	6619834814573959	CMakeFiles/c_dyn_alloc.dir/main.c.obj	ffc950f68c7856de
+108	241	6619834815845180	c_dyn_alloc.exe	830c0bea34fb373e

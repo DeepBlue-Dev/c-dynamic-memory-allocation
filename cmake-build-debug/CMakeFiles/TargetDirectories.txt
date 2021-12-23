@@ -1,0 +1,3 @@
+C:/Users/arthu/Documents/CLion_projects/c_dyn_alloc/cmake-build-debug/CMakeFiles/c_dyn_alloc.dir
+C:/Users/arthu/Documents/CLion_projects/c_dyn_alloc/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/arthu/Documents/CLion_projects/c_dyn_alloc/cmake-build-debug/CMakeFiles/rebuild_cache.dir
