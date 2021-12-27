@@ -6,13 +6,16 @@
 
 //  struct to hold the info to the memory region
 typedef struct Region{
-	int* ptr;
-	int element_count;
+	unsigned short* ptr;
+	unsigned int element_count;
 	unsigned long size;
+	unsigned char is_compressed:1;
 }region;
 
-int generate_fake_sensor_data(void);
+unsigned short generate_fake_sensor_data(void);
+unsigned short compress_data(unsigned short p_data1, unsigned short p_data2);
 void resize(region* p_mem);
+void compress_region(region* p_mem);
 
 int main() {
 	clock_t start_time, end_time;
@@ -27,17 +30,18 @@ int main() {
 			NULL,
 			0,
 			0,
+			0
 	};
 
-	mem.ptr = (int*) malloc(MALLOC_AMNT * sizeof(int));
-	unsigned int index = 0;
+	mem.ptr = (unsigned short*) malloc(MALLOC_AMNT * sizeof(short));
+	unsigned short index = 0;
 	if(mem.ptr == NULL){
 		printf("ptr to region is NULL");
 		exit(0);
 	}
 
-	while( (mem.element_count * sizeof(int)) < MAX_REGION_SIZE && mem.ptr != NULL){
-		if(mem.element_count * sizeof(int) == mem.size){
+	while( (mem.element_count * sizeof(short)) < MAX_REGION_SIZE && mem.ptr != NULL){
+		if(mem.element_count * sizeof(short) == mem.size){
 			resize(&mem);
 		}
 
@@ -52,26 +56,49 @@ int main() {
 			printf("\n");
 		}
 	}
-	printf("\n\n");
-
-	end_time = clock();
-	printf("%Lf %Lf \n", (long double)start_time, (long double) end_time);
-	printf("execution took: %Lf ms\n", (long double)(end_time - start_time));
 	printf("Allocated %d bytes, held %d elements\n", mem.size, mem.element_count);
-	free(mem.ptr);
+	compress_region(&mem);
+	printf("compressed allocated bytes %d, held %d elements", mem.size,mem.element_count);
+
+	printf("\n\n");	//	fixes format
+	end_time = clock();
+	printf("execution took: %Lf ms\n", (long double)(end_time - start_time));
+
+	free(mem.ptr);	//	release memory back to the os
 
 	time(&now);
 	printf("program ended at: %s", ctime(&now));
 	return 0;
 }
 
-int generate_fake_sensor_data(void){
+//	generates reasonably accurate data that comes from the adc.
+unsigned short generate_fake_sensor_data(void){
 	//  I have a 10 bit ADC -> 1024 is max
-	return (rand() % 1025); // NOLINT(cert-msc50-cpp)
+	return (short)(rand() % 1025); // NOLINT(cert-msc50-cpp)
 }
 
+//	increases the size of the memory region
 void resize(region* p_mem){
 	p_mem->ptr = realloc(p_mem->ptr,
-						 p_mem->size + (MALLOC_AMNT * sizeof(int)));	//	grows the region
-	p_mem->size += MALLOC_AMNT * sizeof(int);
+						 p_mem->size + (MALLOC_AMNT * sizeof(unsigned short)));	//	grows the region
+	p_mem->size += MALLOC_AMNT * sizeof(unsigned short);
+}
+
+//
+unsigned short compress_data(unsigned short p_data1, unsigned short p_data2){
+	return USHRT_MAX;
+}
+
+void compress_region(region* p_mem){
+
+	unsigned short roof;	//	the index of the last item, we do not want to read out of bounds
+
+	roof = p_mem->element_count - ((p_mem->element_count & 0x01)?(3):(2));	//	if the number of elements is uneven, make it even
+
+	for(unsigned short index = 0; index < roof; index += 2){
+		p_mem->ptr[index] = (unsigned short)(p_mem->ptr[index] << 2) | (p_mem->ptr[index + 1] & 0x0300);
+		p_mem->ptr[index + 1] = (unsigned short)(p_mem->ptr[index + 1] & 0x00FF);	//	discard the bits we moved to the left
+	}
+	//	calculate new region size
+	p_mem->size = (unsigned short) (((p_mem->size * 8) - (2 * p_mem->element_count)) / 8);
 }
